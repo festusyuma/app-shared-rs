@@ -9,10 +9,12 @@ a bespoke pair per service.
 - **`ServiceError`**: the handful of HTTP error shapes a service needs to return —
   `NotFound`, `ServerError`, `Http(code)`, `HttpMessage(code, message)` — with
   `IntoResponse` so it can be returned directly from an `axum` handler as
-  `{ "error": "..." }` JSON. `From<anyhow::Error>` collapses any anyhow error into a
+  `{ "error": "..." }` JSON. `Http(code)` uses the given status with the generic
+  `"Internal server error"` message; use `HttpMessage` to say what went wrong. `From<anyhow::Error>` collapses any anyhow error into a
   logged `ServerError`.
-- **`ServiceResponse<T>`**: wraps a handler's success value (`Ok`/`Status`) or a
-  `ServiceError`, rendering either as `{ "data": ... }` or `{ "error": ... }` JSON.
+- **`ServiceResponse<T>`**: wraps a handler's success value (`Ok`, or `Status` with a
+  custom status code) or a `ServiceError` (`Err`), rendering either as `{ "data": ... }`
+  or `{ "error": ... }` JSON. `into_result()` turns it back into a `ServiceResult<T>`.
 - **`ServiceResult<T>`**: `Result<T, ServiceError>` — the return type service functions
   use internally, convertible into a `ServiceResponse<T>` at the controller boundary.
 
